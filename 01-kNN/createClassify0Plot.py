@@ -1,4 +1,4 @@
-#-*-coding:utf-8-*-
+#coding:utf-8
 '''
 绘制 classify0
 '''
