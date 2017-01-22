@@ -1,9 +1,17 @@
+#coding:utf-8
 from numpy import *
 import operator
 
 def createDataSet():
 	group = array([[1.0, 1.1], [1.0, 1.0], [0,0], [0, 0.1]])
 	labels = ['A', 'A', 'B', 'B']
+	return group, labels
+
+def createFilmDataSet(): 
+	group = array([
+		[3, 104], [2, 100], [1, 81], [101, 10], [99, 5], [98, 2]
+	])
+	labels = ['love', 'love', 'love', 'action', 'action', 'action']
 	return group, labels
 
 def classify0(inX, dataSet, labels, k):
@@ -41,5 +49,41 @@ def file2matrix(filename):
 		index += 1
 	return returnMat, classLabelVector
 
+# normalizing values
+def autoNorm(dataSet):
+	minVals = dataSet.min(0)
+	maxVals = dataSet.max(0)
+	ranges = maxVals - minVals
+	normDataSet = zeros(shape(dataSet))
+	m = dataSet.shape[0]
+	normDataSet = dataSet - tile(minVals, (m, 1))
+	normDataSet = normDataSet * 1.0 / tile(ranges, (m, 1)) 
+	return normDataSet, ranges, minVals
 
+# 假设用 90% 的数据作为训练样本，用 10% 的数据作为测试数据。并统计出错误率。
+def datingClassTest ():
+	hoRatio = 0.1
+	datingDataMat, datingLabels = file2matrix('datingTestSet2.txt')
+	normMat, ranges, minVals = autoNorm(datingDataMat)
+	m = normMat.shape[0]
+	numTestVecs = int(m * hoRatio)
+	errorCount = 0
+	for i in range(numTestVecs):
+		result = classify0(normMat[i, :], normMat[numTestVecs:m, :], datingLabels[numTestVecs:m], 3)
+		print "The classifier came back with: %d, the real answer is: %d " % (result, datingLabels[i])
+		if (result != datingLabels[i]):
+			errorCount += 1.0
+	print 'The total error rate is: %f' % (errorCount/float(numTestVecs))
 
+def classifyPerson ():
+	resultList = ['not at all', 'in small doses', 'in large doses']
+	percentTats = float(raw_input('percentage of time spend playing video games?'))
+	ffMiles = float(raw_input('frequent filier miles earned per year?'))
+	iceCream = float(raw_input('liters of ice cream consumed per year?'))
+
+	datingDataMat, datingLabels = file2matrix('datingTestSet2.txt')
+	normMat, ranges, minVals = autoNorm(datingDataMat)
+	inArr = array([ffMiles, percentTats, iceCream])
+	result = classify0((inArr - minVals) / ranges, normMat, datingLabels, 3)
+
+	print "You will probably like this person:", resultList[result - 1]
