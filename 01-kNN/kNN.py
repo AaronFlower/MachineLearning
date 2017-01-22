@@ -1,5 +1,6 @@
 #coding:utf-8
 from numpy import *
+from os import listdir
 import operator
 
 def createDataSet():
@@ -87,3 +88,38 @@ def classifyPerson ():
 	result = classify0((inArr - minVals) / ranges, normMat, datingLabels, 3)
 
 	print "You will probably like this person:", resultList[result - 1]
+
+def img2vector(fileName):
+	vector = zeros((1, 1024))
+	fr = open(fileName)
+	for i in range(32):
+		lineStr = fr.readline()
+		for j in range(32):
+			vector[0, i * 32 + j] = int(lineStr[j])
+	return vector
+
+def handWritingClassTest ():
+	hwLabels = []
+	trainingFileList = listdir('./Ch02/digits/trainingDigits')
+	m = len(trainingFileList)
+	trainingMat = zeros((m, 1024))
+	for i in range(m):
+		fileNameStr = trainingFileList[i]
+		fileStr = fileNameStr.split('.')[0]
+		labelNumStr = int(fileStr.split('_')[0])
+		hwLabels.append(labelNumStr)
+		trainingMat[i, :] = img2vector('./Ch02/digits/trainingDigits/%s' % fileNameStr)
+
+	testFileList = listdir('./Ch02/digits/testDigits')
+	errorCount = 0.0
+	mTest = len(testFileList)
+	for i in range(mTest):
+		fileNameStr = testFileList[i]
+		fileStr = fileNameStr.split('.')[0]
+		labelNumStr = int(fileStr.split('_')[0])
+		inVector = img2vector('./Ch02/digits/testDigits/%s' % fileNameStr)
+		result = classify0(inVector, trainingMat, hwLabels, 3)
+		print 'the classifier came back: %d, the real answer is: %d' % (result, labelNumStr)
+		if (result != labelNumStr): errorCount += 1.0
+		print 'The total number of errors is: %d' % errorCount
+		print 'The total error rate is: %f' % (errorCount/float(mTest))
