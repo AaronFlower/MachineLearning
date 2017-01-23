@@ -104,6 +104,7 @@ def handWritingClassTest ():
 	m = len(trainingFileList)
 	trainingMat = zeros((m, 1024))
 	for i in range(m):
+		# 文件名的第一个数字是训练样本的分类
 		fileNameStr = trainingFileList[i]
 		fileStr = fileNameStr.split('.')[0]
 		labelNumStr = int(fileStr.split('_')[0])
@@ -121,5 +122,5 @@ def handWritingClassTest ():
 		result = classify0(inVector, trainingMat, hwLabels, 3)
 		print 'the classifier came back: %d, the real answer is: %d' % (result, labelNumStr)
 		if (result != labelNumStr): errorCount += 1.0
-		print 'The total number of errors is: %d' % errorCount
-		print 'The total error rate is: %f' % (errorCount/float(mTest))
+	print 'The total number of errors is: %d' % errorCount
+	print 'The total error rate is: %f' % (errorCount/float(mTest))

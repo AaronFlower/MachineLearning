@@ -20,6 +20,7 @@ def createVocabList(wordLists):
 		vocabSet = vocabSet | set(wdList)
 	return list(vocabSet)
 
+# set-of-words model 词集模型
 def setOfWords2Vec(vocabList, msg):
 	returnVec = [0] * len(vocabList)
 	for word in msg:
@@ -27,6 +28,15 @@ def setOfWords2Vec(vocabList, msg):
 			returnVec[vocabList.index(word.lower())] = 1
 	return returnVec
 
+# bag-of-words model 词包模型
+def bagOfWords2Vec(vocabList, msg):
+	returnVec = [0] * len(vocabList)
+	for word in msg:
+		if word in vocabList:
+			returnVec[vocabList.index(word)] += 1
+	return returnVec
+
+# 获取训练数据
 def getTrainingDataSet():
 	msgLists, classList = createDataSet()
 	vocabList = createVocabList(msgLists)
