@@ -91,5 +91,30 @@ def createTree(dataSet, labels):
 	for val in uniqueVals:
 		subLabels = labels[:]
 		myTree[bestFeatureLabel][val] = createTree(splitDataSet(dataSet, bestFeature, val), subLabels)
-
 	return myTree
+
+# 使用决策树的分类
+def classify(inTree, featureLabels, testVec):
+	firstStr =  inTree.keys()[0]
+	secondDict = inTree[firstStr]
+	featureIndex = featureLabels.index(firstStr)
+	for key in secondDict.keys():
+		if testVec[featureIndex] == key:
+			if type(secondDict[key]).__name__ == 'dict':
+				classLabel = classify(secondDict[key], featureLabels, testVec)
+			else:
+				classLabel = secondDict[key]
+	return classLabel
+
+# 存储决策树
+def storeTree(inTree, fileName):
+	import pickle
+	fw = open(fileName, 'w')
+	pickle.dump(inTree, fw)
+	fw.close()
+
+# 读取决策树
+def grabTree(fileName):
+	import pickle
+	fr = open(fileName)
+	return pickle.load(fr)
