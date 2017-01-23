@@ -80,6 +80,7 @@ def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
 	else :
 		return 0
 
+# 测试 Naive Bayes 分类.
 def testingNB():
 	dataSet, trainCategory = loadDataSet()
 	myVocabList = createVocabList(dataSet)
@@ -93,4 +94,48 @@ def testingNB():
 	thisDoc = array(bagOfWords2Vec(myVocabList, testEntry))
 	result = classifyNB(thisDoc, p0V, p1V, pAb)
 	print testEntry, 'classified as:', 	result
+
+# Ham, A message is called ham when it's not spam.
+# 文本解析及完整的垃圾邮件测试函数.
+
+def textParse(bigString):
+	import re
+	listOfTokens = re.split(r'\W*', bigString)
+	return [tok.lower() for tok in listOfTokens if len(tok) > 2]
+
+def spamTest():
+	docList = []; classList = []; fullText = []
+	for i in range(1, 26):
+		wordList = textParse(open('Ch04/email/spam/%d.txt' % i).read())
+		docList.append(wordList)
+		fullText.extend(wordList)
+		classList.append(1)
+		wordList = textParse(open('Ch04/email/ham/%d.txt' % i).read())
+		docList.append(wordList)
+		fullText.extend(wordList)
+		classList.append(0)
+
+	vocabList = createVocabList(docList)
+	trainingSet = range(50); testSet = []
+	# 随机选择 40 个训练样本 和 10 个测试数据。
+	for i in range(10):
+		randIndex = int(random.uniform(0, len(trainingSet)))
+		testSet.append(trainingSet[randIndex])
+		del(trainingSet[randIndex])
+
+	trainingMat = []
+	trainingClasses = []
+	for docIndex in trainingSet:
+		trainingMat.append(setOfWords2Vec(vocabList, docList[docIndex]))
+		trainingClasses.append(classList[docIndex])
+
+	p0V, p1V, pSpam = trainNB0(array(trainingMat), array(trainingClasses))
+	errorCount = 0
+	for docIndex in testSet:
+		wordVector = setOfWords2Vec(vocabList, docList[docIndex])
+		classResult = classifyNB(array(wordVector), p0V, p1V, pSpam)
+		print 'docIndex %d: came back is : %s , the real class is: %s' % (docIndex, classResult, classList[docIndex])
+		if classResult != classList[docIndex]:
+			errorCount += 1
+	print 'The error rate is:', float(errorCount) / len(testSet)
 
