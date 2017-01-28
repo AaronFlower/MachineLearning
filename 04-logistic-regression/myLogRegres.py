@@ -27,10 +27,22 @@ def batchGradientDescent(dataMat, labelMat):
 	labelMatY = mat(labelMat).transpose()
 	weights = ones((n, 1)) 	# 初始化各参数的初始值都为 1.
 	alpha = 0.001 					# learning rate, alpha = 0.001
-	for i in range(500):
+	maxCycles = 500
+	for i in range(maxCycles):
 		h = hypothesis(dataMatX * weights)
 		error = labelMatY - h
 		weights = weights + alpha * dataMatXT *error
+	return weights
+
+# 通过 Stochastic Gradient Descent 来求出参数 weights
+def stoGradientDescent1(dataMat, labelMat):
+	m, n = shape(dataMat) # dataMat 不需要再转换成 matrix
+	weights = ones(n)
+	alpha = 0.01
+	for i in range(m):
+		h = hypothesis(sum(dataMat[i] * weights))
+		error = labelMat[i] - h
+		weights = weights + alpha * error * dataMat[i]
 	return weights
 
 # 求出 weights 参数后，我们可以根据 weight 来画出拟合曲线。
