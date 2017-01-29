@@ -61,6 +61,22 @@ def stoGradientDescent1(dataMat, labelMat):
 		weightsHis[i] = weights
 	return weights, weightsHis
 
+# 改进后的 Stochastic Gradient Descent 来求出参数 weights.
+def stoGradientDescent2(dataMat, labelMat, numIter = 200):
+	m, n = shape(dataMat)
+	weights = ones(n)
+	weightsHis = zeros((numIter * m, 3))
+	for j in range(numIter):
+		dataIndex = range(m)
+		for i in range(m):
+	 		alpha = 4.0 / (1.0 + i + j) + 0.01
+	 		randIndex = int(random.uniform(0, len(dataIndex)))
+	 		error = labelMat[randIndex] - hypothesis(sum(dataMat[randIndex] * weights))
+	 		weights = weights + alpha * error * dataMat[randIndex]
+	 		weightsHis[j * m + i] = weights
+	 		del(dataIndex[randIndex])
+	return weights, weightsHis
+
 # 求出 weights 参数后，我们可以根据 weight 来画出拟合曲线。
 '''
 	在本例中，因为假设 Z = w0 * x0 + w1 * x1 + w2 * x2
@@ -85,7 +101,7 @@ def plotBestFit(weights):
 	ax = fig.add_subplot(111)
 	ax.scatter(xcord1, ycord1, s=30, c='r', marker='s')
 	ax.scatter(xcord2, ycord2, s=30)
-	x = arange(-3.0, 3.0, 0.1)
+	x = arange(-3.5, 3.5, 0.1)
 	y = (-weights[0] - weights[1] * x) / weights[2]
 	ax.plot(x, y)
 	plt.xlabel('X1')
