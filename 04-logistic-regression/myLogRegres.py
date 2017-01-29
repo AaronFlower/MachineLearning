@@ -34,16 +34,32 @@ def batchGradientDescent(dataMat, labelMat):
 		weights = weights + alpha * dataMatXT *error
 	return weights
 
+def batchGradientDescentWithHis(dataMat, labelMat, maxCycles = 500):
+	dataMatX = mat(dataMat)
+	dataMatXT = dataMatX.transpose()
+	m, n = shape(dataMatX)
+	labelMatY = mat(labelMat).transpose()
+	alpha = 0.001
+	weights = ones((n, 1))
+	weightsHis = ones((maxCycles, n))
+	for i in range(maxCycles):
+		error = labelMatY - hypothesis(dataMatX * weights)
+		weights = weights + alpha * dataMatXT * error
+		weightsHis[i][:] = weights.transpose()
+	return weights, weightsHis
+
 # 通过 Stochastic Gradient Descent 来求出参数 weights
 def stoGradientDescent1(dataMat, labelMat):
 	m, n = shape(dataMat) # dataMat 不需要再转换成 matrix
 	weights = ones(n)
+	weightsHis = zeros((m, 3))
 	alpha = 0.01
 	for i in range(m):
 		h = hypothesis(sum(dataMat[i] * weights))
 		error = labelMat[i] - h
 		weights = weights + alpha * error * dataMat[i]
-	return weights
+		weightsHis[i] = weights
+	return weights, weightsHis
 
 # 求出 weights 参数后，我们可以根据 weight 来画出拟合曲线。
 '''
@@ -74,4 +90,20 @@ def plotBestFit(weights):
 	ax.plot(x, y)
 	plt.xlabel('X1')
 	plt.ylabel('X2')
+	plt.show()
+
+# 绘制出 w0, w1, w2 三个参数的收敛曲线。
+def plotRegressionHistory(weightsHis):
+	import matplotlib.pyplot as plt
+
+	fig = plt.figure()
+	ax = fig.add_subplot(311)
+	ax.plot(weightsHis[:, 0])
+	plt.ylabel('w0')
+	ax = fig.add_subplot(312)
+	ax.plot(weightsHis[:, 1])
+	plt.ylabel('w1')
+	ax = fig.add_subplot(313)
+	ax.plot(weightsHis[:, 2])
+	plt.ylabel('w2')
 	plt.show()
