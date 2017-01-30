@@ -77,6 +77,13 @@ def stoGradientDescent2(dataMat, labelMat, numIter = 200):
 	 		del(dataIndex[randIndex])
 	return weights, weightsHis
 
+# 用最小二乘修证来直接求出 weights : w = (X.T * X).I * X.T * Y
+def leastSquaresRevisited(dataMat, labelMat):
+	dataMatX = mat(dataMat)
+	dataMatXT = dataMatX.T
+	Y = mat(labelMat).T
+	return (dataMatXT * dataMatX).I * dataMatXT * Y
+
 # 求出 weights 参数后，我们可以根据 weight 来画出拟合曲线。
 '''
 	在本例中，因为假设 Z = w0 * x0 + w1 * x1 + w2 * x2
