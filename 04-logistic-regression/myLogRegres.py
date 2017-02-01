@@ -18,9 +18,9 @@ def loadData():
 def hypothesis(inX):
 	return 1.0 / (1 + exp(-inX)) # 这里的 exp 不 math.exp 而是 numpy 中的 exp 函数，可以处理数组。
 
-# 通过 Batch Gradient Descent 来求出参数 weights. 
+# 通过 Batch Gradient Ascent 来求出参数 weights. 
 # 顺便体验下 python numpy 的强大的矩阵计算功能。
-def batchGradientDescent(dataMat, labelMat):
+def batchGradientAscent(dataMat, labelMat):
 	dataMatX = mat(dataMat)
 	dataMatXT = dataMatX.transpose()
 	m,n = shape(dataMatX)
@@ -34,7 +34,7 @@ def batchGradientDescent(dataMat, labelMat):
 		weights = weights + alpha * dataMatXT *error
 	return weights
 
-def batchGradientDescentWithHis(dataMat, labelMat, maxCycles = 500):
+def batchGradientAscentWithHis(dataMat, labelMat, maxCycles = 500):
 	dataMatX = mat(dataMat)
 	dataMatXT = dataMatX.transpose()
 	m, n = shape(dataMatX)
@@ -48,8 +48,8 @@ def batchGradientDescentWithHis(dataMat, labelMat, maxCycles = 500):
 		weightsHis[i][:] = weights.transpose()
 	return weights, weightsHis
 
-# 通过 Stochastic Gradient Descent 来求出参数 weights
-def stoGradientDescent1(dataMat, labelMat):
+# 通过 Stochastic Gradient Ascent 来求出参数 weights
+def stoGradientAscent1(dataMat, labelMat):
 	m, n = shape(dataMat) # dataMat 不需要再转换成 matrix
 	weights = ones(n)
 	weightsHis = zeros((m, 3))
@@ -61,8 +61,8 @@ def stoGradientDescent1(dataMat, labelMat):
 		weightsHis[i] = weights
 	return weights, weightsHis
 
-# 改进后的 Stochastic Gradient Descent 来求出参数 weights.
-def stoGradientDescent2(dataMat, labelMat, numIter = 200):
+# 改进后的 Stochastic Gradient Ascent 来求出参数 weights.
+def stoGradientAscent2(dataMat, labelMat, numIter = 200):
 	m, n = shape(dataMat)
 	weights = ones(n)
 	weightsHis = zeros((numIter * m, 3))
