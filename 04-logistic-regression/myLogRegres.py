@@ -84,6 +84,23 @@ def leastSquaresRevisited(dataMat, labelMat):
 	Y = mat(labelMat).T
 	return (dataMatXT * dataMatX).I * dataMatXT * Y
 
+# 求出 Hessian 矩阵. 
+def getHessianMat(dataMat, weights):
+	m, n = shape(dataMat)
+	hessianMat = mat(zeros((m, n)))
+	for i in range(m):
+		hypoValue = hypothesis(sum(dataMat[i].getA() * weights))
+		hessianMat[i] = dataMat[i] * (- dataMat[i, i] *  hypoValue * (1 - hypoValue))
+	return hessianMat
+
+# 用 Newtown 方法来求出 weights
+# def newtownFisherScoring(dataMat, labelMat, numIter = 20):
+	# dataMatX = mat(dataMat)
+	# m, n = shape(dataMatX)
+	# weights = zeros(n)
+	# for i in range(numIter):
+	# 	error = 
+
 # 求出 weights 参数后，我们可以根据 weight 来画出拟合曲线。
 '''
 	在本例中，因为假设 Z = w0 * x0 + w1 * x1 + w2 * x2
