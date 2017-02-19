@@ -83,9 +83,9 @@ def simpleSMO(dataMat, labelMat, C, toler, maxIterNum):
 	                continue
 
 	            alphas[i] += labelMat[i] * labelMat[j] * (alphaJold - alphas[j])
-	            iDiff = alphas[i] - alphaIold; jDiff = alphas[j] - alphaJold
-	            b1 = b - iDiff * labelMat[i] * kij(dataMat, i, i) - jDiff * labelMat[j] * kij(dataMat, i, j) - Ei 
-	            b2 = b - iDiff * labelMat[i] * kij(dataMat, i, j) - jDiff * labelMat[j] * kij(dataMat,j, j) - Ej 
+	            iDiff = alphaIold -alphas[i]; jDiff = alphaJold - alphas[j]
+	            b1 = iDiff * labelMat[i] * kij(dataMat, i, i) + jDiff * labelMat[j] * kij(dataMat, i, j) - Ei + b
+	            b2 = iDiff * labelMat[i] * kij(dataMat, i, j) + jDiff * labelMat[j] * kij(dataMat,j, j) - Ej + b
 
 	            if 0 <= alphas[i] <= C:
 	                b = b1
