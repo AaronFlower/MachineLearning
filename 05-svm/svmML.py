@@ -30,13 +30,12 @@ def clipAlpha(aj, H, L):
   return aj
 
 # 简化版 SMO 算法
-def smoSimple(dataMatIn, classLabels, C, toler, matIter):
+def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
     dataMat = mat(dataMatIn); labelMat = mat(classLabels).transpose()
-    b = 0
     m,n = shape(dataMat)
-    alphas = mat(zeros((m, 1)))
+    alphas = mat(zeros((m, 1))); b = 0
     iterNum = 0
-    while (iterNum < matIter):
+    while (iterNum < maxIter):
         alphaPairsChanged = 0
         for i in range(m):
             fXi = float(multiply(alphas, labelMat).T * (dataMat * dataMat[i, :].T)) + b
@@ -50,10 +49,10 @@ def smoSimple(dataMatIn, classLabels, C, toler, matIter):
 
                 if (labelMat[i] != labelMat[j]):
                     L = max(0, alphas[j] - alphas[i])
-                    H = max(C, C + alphas[j] - alphas[i])
+                    H = min(C, C + alphas[j] - alphas[i])
                 else:
                     L = max(0, alphas[i] + alphas[j] - C)
-                    H = max(C, alphas[j] + alphas[i])
+                    H = min(C, alphas[j] + alphas[i])
                 if L == H:
                     print "L == H"; continue
 
@@ -70,9 +69,9 @@ def smoSimple(dataMatIn, classLabels, C, toler, matIter):
                 alphas[i] += labelMat[j] * labelMat[i] * (alphaJold - alphas[j])
                 b1 = b - Ei - labelMat[i] * (alphas[i] - alphaIold) * dataMat[i, :] * dataMat[i, :].T - labelMat[j] * (alphas[j] - alphaJold) * dataMat[i, :] * dataMat[j, :].T
                 b2 = b - Ej - labelMat[i] * (alphas[i] - alphaIold) * dataMat[i, :] * dataMat[j, :].T - labelMat[j] *(alphas[j] - alphaJold) * dataMat[j, :] * dataMat[j, :].T
-                if (0 < alphas[i]) and (C > alphas[i]): 
+                if (0 < alphas[i] < C): 
                     b = b1
-                elif (0 < alphas[j]) and (C > alphas[j]):
+                elif (0 < alphas[j] < C):
                     b = b2
                 else:
                     b = (b1 + b2) / 2.0
@@ -80,10 +79,10 @@ def smoSimple(dataMatIn, classLabels, C, toler, matIter):
                 alphaPairsChanged += 1
                 print "iter: %d i:%d, pairs changed %d" % (iterNum, i, alphaPairsChanged)
             
-            if (alphaPairsChanged == 0):
-                iter += 1
-            else:
-                iter = 0
+        if (alphaPairsChanged == 0):
+            iterNum += 1
+        else:
+            iterNum = 0
 
-            print "iteration number: %d" % iterNum
-        return b, alphas
+        print "iteration number: %d" % iterNum
+    return b, alphas
