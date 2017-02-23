@@ -139,4 +139,29 @@ def smoP(dataMatIn, labelMatIn, C, toler, maxIter, kTup = ('lin', 0)):
         print "iteration number: %d" % iter
     return oS.b, oS.alphas
 
+# 计算超平面的法向量 w 
+def calcWs(dataArr, labelArr, alphas):
+    X = mat(dataArr)
+    Y = mat(labelArr).T
+    m,n = shape(X)
+    w = zeros((n,1))
+    for i in range(m):
+        w += multiply(alphas[i]*Y[i], X[i,:].T)
+    return w
 
+# smo 分类数据分析
+def smoClassifier(dataMatIn, labelMatIn, C, toler, maxIter):
+    b, alphas = smoP(dataMatIn, labelMatIn, C, toler, maxIter)
+    ws = mat(calcWs(dataMatIn, labelMatIn, alphas))
+    dataMat = mat(dataMatIn)
+    labelMat = mat(labelMatIn).T
+    m, n = shape(dataMat)
+    errorCount = 0
+    print ws
+    print dataMat[0, :]
+    for i in range(m):
+        if (sign(dataMat[i, :] * ws + b) * labelMat[i]) != 1 :
+            errorCount += 1
+    correctness = (1.0 - float(errorCount) / float(m)) * 100
+    print 'm: %d, error: %d, correctness is %d' % (m, errorCount, correctness)
+    return ws, b, alphas, correctness
