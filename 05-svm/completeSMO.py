@@ -34,7 +34,7 @@ def calcEk(oS, k):
     Ek = fXk - float(oS.labelMat[k])
     return Ek
 
-# 计算 Kij = K<Xi, Xj>
+# 计算向量内积 Kij = K<Xi, Xj>
 def Kij(oS, i, j):
     return oS.X[i,:] * oS.X[j,:].T
 
@@ -59,23 +59,18 @@ def selectJ(oS, i, Ei):
     oS.cacheE[i] = [1, Ei]
     #nonzero 会根据传入的数组的维度，返回相应维度的数组。这里第一维是我们非0的行数，正是我们需要的。
     validElist = nonzero(oS.cacheE[:, 0].A)[0] 
-    print 'validList:', validElist, len(validElist)
     if (len(validElist)) > 1:
         for k in validElist:
             if k == i : continue
             Ek = calcEk(oS, k)
             deltaE = abs(Ei - Ek)
             if deltaE > maxDeltaE:
-                maxK = k; maxDeltaE = deltaE; Ej = k
-        print 'select:', i, Ei
-        print 'if ---', maxK, Ej
+                maxK = k; maxDeltaE = deltaE; Ej = Ek
         return maxK, Ej
     else:
         # 初始化时，所有的 Ei 的 valid 属性肯定都是 false ，所以我们还是需要 selectJrand 的。
         j = selectJrand(i, oS.m)
         Ej = calcEk(oS, j)
-        print 'select:', i, Ei
-        print 'else ---', j, Ej
         return j, Ej
 
 # 更新 Ek
@@ -87,15 +82,15 @@ def updateEk(oS, k):
 def innerL(oS, i):
     Ei = calcEk(oS, i);
     sEi = oS.labelMat[i] * Ei
-    if ((sEi < -oS.toler) and (oS.alphas[i] < oS.C) or (sEi > oS.toler) and (oS.alphas[i] > 0)):
+    if ((sEi < -oS.toler) and (oS.alphas[i] < oS.C)) or ((sEi > oS.toler) and (oS.alphas[i] > 0)):
         j, Ej = selectJ(oS, i, Ei)
         alphaIold = oS.alphas[i].copy(); alphaJold = oS.alphas[j].copy()
-        if (oS.labelMat[i] == oS.labelMat[j]):
-            L = max(0, oS.alphas[i] + oS.alphas[j] - oS.C)
-            H = min(oS.C, oS.alphas[i] + oS.alphas[j])
-        else:
+        if (oS.labelMat[i] != oS.labelMat[j]):
             L = max(0, oS.alphas[j] - oS.alphas[i])
             H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])
+        else:
+            L = max(0, oS.alphas[i] + oS.alphas[j] - oS.C)
+            H = min(oS.C, oS.alphas[i] + oS.alphas[j])
         if L == H:
             print 'L == H'; return 0
         eta = 2.0 * Kij(oS, i, j) - Kij(oS, i, i) - Kij(oS, j, j)
@@ -106,7 +101,7 @@ def innerL(oS, i):
         updateEk(oS, j)
         if(abs(oS.alphas[j] - alphaJold) < 0.00001):
             print 'j not moving enough '; return 0
-        oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - alphaIold)
+        oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])
         updateEk(oS, i)
 
         diffI = oS.alphas[i] - alphaIold
@@ -131,7 +126,7 @@ def smoP(dataMatIn, labelMatIn, C, toler, maxIter, kTup = ('lin', 0)):
         if entireSet:
             for i in range(oS.m):
                 alphaPairsChanged += innerL(oS, i)
-            print "fullSet, iter: %d i: %d, paires changed %d " % (iter, i, alphasPairsChanged)
+                print "fullSet, iter: %d i: %d, paires changed %d " % (iter, i, alphasPairsChanged)
             iter += 1
         else:
             nonBoundIs = nonzero((oS.alphas.A > 0) * (oS.alphas.A < C))[0]
@@ -142,9 +137,6 @@ def smoP(dataMatIn, labelMatIn, C, toler, maxIter, kTup = ('lin', 0)):
         if entireSet: entireSet = False
         elif (alphasPairsChanged == 0): entireSet = True
         print "iteration number: %d" % iter
-        print 'condition:'
-        print iter, alphaPairsChanged, entireSet, maxIter
-        print (iter < maxIter) and ((alphasPairsChanged > 0) or (entireSet))
     return oS.b, oS.alphas
 
 
