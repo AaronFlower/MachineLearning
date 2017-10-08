@@ -18,7 +18,7 @@ def grab_initial_data():
 	states = list_states()
 	for state in states:
 		query = "FMAC/HPI_" + state
-		df = quandl.get(query, authtoken=api_key, start_date='2001-01-31')
+		df = quandl.get(query, authtoken=api_key)
 		df.columns = [state]
 		if main_df.empty:
 			main_df = df
