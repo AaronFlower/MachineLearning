@@ -57,7 +57,6 @@ def gdp_data():
 	df.rename(columns={'Value':'GDP'}, inplace=True)
 	df = df['GDP']
 	return df
-
 def us_unemployment():
 	''' USA unemployment '''
 	df = quandl.get("ECPI/JOB_G", trim_start="1975-01-01", authtoken=api_key)
@@ -73,7 +72,6 @@ m30.columns = ['M30']
 # sp500 = sp500_data()
 gdp = gdp_data()
 # unemployment = us_unemployment()
-
 HPI = HPI_bench.join([m30, gdp])
 print(HPI.corr().head())
-
+HPI.to_pickle('HPI.pickle')
