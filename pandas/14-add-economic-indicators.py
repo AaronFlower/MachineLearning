@@ -46,17 +46,17 @@ def sp500_data():
 	df["Adjusted Close"] = (df["Adjusted Close"]-df["Adjusted Close"][0]) / df["Adjusted Close"][0] * 100.0
 	df=df.resample('M').mean()
 	df.rename(columns={'Adjusted Close':'sp500'}, inplace=True)
-	df = df['sp500']
 	return df
 
 def gdp_data():
 	''' GDP: gross domestic product '''
 	df = quandl.get("BCB/4385", trim_start="1975-01-01", authtoken=api_key)
+	print('gdp_data')
 	df["Value"] = (df["Value"]-df["Value"][0]) / df["Value"][0] * 100.0
 	df=df.resample('M').mean()
 	df.rename(columns={'Value':'GDP'}, inplace=True)
-	df = df['GDP']
 	return df
+
 def us_unemployment():
 	''' USA unemployment '''
 	df = quandl.get("ECPI/JOB_G", trim_start="1975-01-01", authtoken=api_key)
@@ -70,8 +70,10 @@ HPI_bench = HPI_Benchmark()
 m30 = grap_30yr_mortgage()
 m30.columns = ['M30']
 # sp500 = sp500_data()
+## GDP 的数据是从 1990 年开始的。
 gdp = gdp_data()
 # unemployment = us_unemployment()
 HPI = HPI_bench.join([m30, gdp])
-print(HPI.corr().head())
 HPI.to_pickle('HPI.pickle')
+print(HPI.dropna())
+print(HPI.corr().head())
