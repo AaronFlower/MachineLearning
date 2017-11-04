@@ -2,6 +2,7 @@
 # Logistic Regression .
 
 from numpy import *
+import numpy as np
 
 # 加载数据，取出训练集中的， X, Y。 对于 X 假设特征 x0 = 1.0
 def loadData():
@@ -127,7 +128,7 @@ def plotBestFit(weights):
 	ax.scatter(xcord2, ycord2, s=30)
 	x = arange(-3.5, 3.5, 0.1)
 	y = (-weights[0] - weights[1] * x) / weights[2]
-	ax.plot(x, y)
+	ax.plot(x, np.squeeze(np.asarray(y)))
 	plt.xlabel('X1')
 	plt.ylabel('X2')
 	plt.show()
@@ -147,3 +148,12 @@ def plotRegressionHistory(weightsHis):
 	ax.plot(weightsHis[:, 2])
 	plt.ylabel('w2')
 	plt.show()
+
+def plot_LSE_regression():
+	X, y = loadData()
+	ws = leastSquaresRevisited(X, y)
+	print(ws)
+	plotBestFit(ws)
+
+if __name__ == '__main__':
+	plot_LSE_regression()
