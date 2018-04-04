@@ -10,7 +10,7 @@ class Utils {
 public:
 	static double array_sum(double arr[], size_t len);
 
-	static double *array_power(double arr[], size_t len, size_t power);
+	static double *array_power(double arr[], size_t len, int power);
 
 	static double *array_multiplication(double arr1[], double arr2[], size_t len);
 
