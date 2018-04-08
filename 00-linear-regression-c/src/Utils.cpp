@@ -24,7 +24,7 @@ double Utils::array_sum(double arr[], size_t len)
 	return sum;
 }
 
-double *Utils::array_power(double arr[], size_t len, int power)
+double* Utils::array_power(double arr[], size_t len, int power)
 {
 	assert(arr != NULL);
 	
