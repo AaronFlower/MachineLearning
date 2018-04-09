@@ -9,7 +9,7 @@ using std::istringstream;
 using std::cout;
 using std::endl;
 
-void Utils::loadData(string filename, vector<vector<double>> &features, vector<double> &labels) {
+void Utils::loadData(string filename, vector<vector<double>> &features, vector<double> &labels, char delimeter) {
 	ifstream isRead(filename);	
 	
 	if (!isRead.is_open()) {
@@ -24,27 +24,23 @@ void Utils::loadData(string filename, vector<vector<double>> &features, vector<d
 	vector<double> rowFeatures;
 
 	while(getline(isRead, line)) {
-		rowValues = parseLine(line);
-		rowFeatures = vector<double>(rowValues.begin(), rowValues.end() - 1);
-		cout << "Kidding: " ;
-		for (auto a:rowValues) {
-			cout << a << " | \t " ;
-		}
-		cout << endl;
-
-		features.push_back(rowFeatures);
+		rowValues = parseLine(line, delimeter);
+		features.push_back(vector<double>(rowValues.begin(), rowValues.end() - 1));
 		labels.push_back(*(rowValues.end() - 1));
 	}	
 }
 
 
-vector<double> Utils::parseLine(string line) {
+vector<double> Utils::parseLine(string line, char delimeter) {
 	istringstream ism(line);
 	vector<double> result;
 	string strValue;
-	
-	while(getline(ism, strValue, ',')) {
-		result.push_back(stod(strValue));
-	}
+	double value;
+	if (delimeter == '\0') {
+		while (ism >> value) result.push_back(value);
+	} else {
+		while (getline(ism, strValue, delimeter)) result.push_back(stod(strValue));
+	}	
+
 	return result;
 }

@@ -17,24 +17,51 @@ vector<double>  parse_line(string line) {
 	return result;
 }
 
-void testLoadDataFromFile() {
-	vector<vector<double>> features;
-	vector<double> labels;
-
-	Utils::loadData("ex1data1.txt", features, labels);
-
-	cout << "Features : \n" << endl;
+void outputFeaturesAndLabels(const vector<vector<double>> &features, const vector<double> &labels) {
+	cout << "Features :" << endl;
 	for (auto row : features) {
 		for (auto v : row) {
 			cout << v << "\t" ;
 		}
-		cout << endl;
+		cout << " | ";
 	}
 
-	cout << "Labels : \n" << endl;
+	cout << endl; 
+
+	cout << "Labels :" << endl;
 	for (auto v: labels) {
-		cout << v << endl;
+		cout << v << "\t";
 	}
+	cout << endl;
+}
+
+void testLoadDataFromFile() {
+	vector<vector<double>> features;
+	vector<double> labels;
+
+	Utils::loadData("ex1data1.csv", features, labels, ',');
+	cout << "ex1data1.csv Features and labels" <<endl;
+	outputFeaturesAndLabels(features, labels);
+	features.clear();
+	labels.clear();
+
+	Utils::loadData("ex1data1.txt", features, labels);
+	cout << "ex1data1.txt Features and labels" <<endl;
+	outputFeaturesAndLabels(features, labels);
+	features.clear();
+	labels.clear();
+
+	Utils::loadData("ex1data2.csv", features, labels, ',');
+	cout << "ex1data2.csv Features and labels" <<endl;
+	outputFeaturesAndLabels(features, labels);
+	features.clear();
+	labels.clear();
+
+	Utils::loadData("ex1data2.txt", features, labels);
+	cout << "ex1data2.txt Features and labels" <<endl;
+	outputFeaturesAndLabels(features, labels);
+	features.clear();
+	labels.clear();
 }
 
 int main () {
