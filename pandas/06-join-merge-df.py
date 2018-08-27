@@ -24,3 +24,5 @@ df3 = pd.DataFrame({
 ## merge, share column 为 HPI， 共同的会做笛卡尔。
 print(pd.merge(df1, df2, on="HPI"))
 print(pd.merge(df1, df2, on=['HPI', 'Int_rate']))
+
+## join

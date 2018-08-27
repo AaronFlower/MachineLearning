@@ -13,5 +13,3 @@ states = pd.read_html('https://simple.wikipedia.org/wiki/List_of_U.S._states')
 # states[0][0][1:] 去掉 abbreviation header
 for abbr in states[0][0][1:]:
 	print("FMAC/HPI_" + abbr)
-
-
