@@ -26,7 +26,7 @@ def setOfWords2Vec(vocabList, inputSet):
 		if word in vocabList:
 			returnVec[vocabList.index(word)] = 1
 		else:
-			print 'the word: %s is not in my Vocabulary!' % word
+			print ('the word: %s is not in my Vocabulary!' % word)
 	return returnVec
 
 # 词包模型, bag-of-words model
@@ -72,9 +72,9 @@ def trainNB0(trainMatrix, trainCategory):
 def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
 	p1 = sum(vec2Classify * p1Vec) + log(pClass1)
 	p0 = sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
-	print '--->>>>'
-	print 'p0 %f, p1 %f' % (p0, p1)
-	print '<<<<---'
+	print ('--->>>>')
+	print ('p0 %f, p1 %f' % (p0, p1))
+	print ('<<<<---')
 	if p1 > p0:
 		return 1
 	else :
@@ -89,11 +89,11 @@ def testingNB():
 	testEntry = ['love', 'love', 'my', 'dalmation']
 	thisDoc = array(bagOfWords2Vec(myVocabList, testEntry))
 	result = classifyNB(thisDoc, p0V, p1V, pAb)
-	print testEntry, 'classified as:', 	result
+	print (testEntry, 'classified as:', 	result)
 	testEntry = ['stupid', 'garbage', 'stupid']
 	thisDoc = array(bagOfWords2Vec(myVocabList, testEntry))
 	result = classifyNB(thisDoc, p0V, p1V, pAb)
-	print testEntry, 'classified as:', 	result
+	print (testEntry, 'classified as:', 	result)
 
 # Ham, A message is called ham when it's not spam.
 # 文本解析及完整的垃圾邮件测试函数.
@@ -106,17 +106,17 @@ def textParse(bigString):
 def spamTest():
 	docList = []; classList = []; fullText = []
 	for i in range(1, 26):
-		wordList = textParse(open('Ch04/email/spam/%d.txt' % i).read())
+		wordList = textParse(open('Ch04/email/spam/%d.txt' % i, errors='ignore', encoding='utf-8').read())
 		docList.append(wordList)
 		fullText.extend(wordList)
 		classList.append(1)
-		wordList = textParse(open('Ch04/email/ham/%d.txt' % i).read())
+		wordList = textParse(open('Ch04/email/ham/%d.txt' % i, errors='ignore', encoding='utf-8').read())
 		docList.append(wordList)
 		fullText.extend(wordList)
 		classList.append(0)
 
 	vocabList = createVocabList(docList)
-	trainingSet = range(50); testSet = []
+	trainingSet = list(range(50)); testSet = []
 	# 随机选择 40 个训练样本 和 10 个测试数据。
 	for i in range(10):
 		randIndex = int(random.uniform(0, len(trainingSet)))
@@ -134,8 +134,10 @@ def spamTest():
 	for docIndex in testSet:
 		wordVector = setOfWords2Vec(vocabList, docList[docIndex])
 		classResult = classifyNB(array(wordVector), p0V, p1V, pSpam)
-		print 'docIndex %d: came back is : %s , the real class is: %s' % (docIndex, classResult, classList[docIndex])
+		print ('docIndex %d: came back is : %s , the real class is: %s' % (docIndex, classResult, classList[docIndex]))
 		if classResult != classList[docIndex]:
 			errorCount += 1
-	print 'The error rate is:', float(errorCount) / len(testSet)
+	print ('The error rate is:', float(errorCount) / len(testSet))
 
+# if __name__ == '__main__':
+spamTest()
