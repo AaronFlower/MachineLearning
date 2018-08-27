@@ -42,7 +42,7 @@ def stageWise(xArr, yArr, eps = 0.01, numIt = 100):
     return ws
 
 def main():
-    features, labels = loadData('Ch08/abalone.txt')
+    features, labels = loadData('./Ch08/abalone.txt')
     weights = stageWise(features, labels, 0.001, 5000)
     print('Max weights:', weights.T)
 
