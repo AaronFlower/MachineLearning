@@ -77,7 +77,7 @@ def kernelTrans(X, A, kTup): #calc the kernel or transform data to a higher dime
         for j in range(m):
             deltaRow = X[j,:] - A
             K[j] = deltaRow*deltaRow.T
-        K = exp(K/(-1*kTup[1]**2)) #divide in NumPy is element-wise not matrix like Matlab
+        K = exp(K/(-2*kTup[1]**2)) #divide in NumPy is element-wise not matrix like Matlab
     else: raise NameError('Houston We Have a Problem -- \
     That Kernel is not recognized')
     return K
@@ -154,6 +154,7 @@ def innerL(i, oS):
 def smoP(dataMatIn, classLabels, C, toler, maxIter,kTup=('lin', 0)):    #full Platt SMO
     print 'Kidding....'
     oS = optStruct(mat(dataMatIn),mat(classLabels).transpose(),C,toler, kTup)
+    print(oS.K)
     iter = 0
     entireSet = True; alphaPairsChanged = 0
     while (iter < maxIter) and ((alphaPairsChanged > 0) or (entireSet)):
@@ -196,7 +197,7 @@ def testRbf(k1=1.3):
     errorCount = 0
     for i in range(m):
         kernelEval = kernelTrans(sVs,datMat[i,:],('rbf', k1))
-        predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b
+        predict = kernelEval.T * multiply(labelSV, alphas[svInd]) + b
         if sign(predict)!=sign(labelArr[i]): errorCount += 1
     print "the training error rate is: %f" % (float(errorCount)/m)
     dataArr,labelArr = loadDataSet('testSetRBF2.txt')
@@ -207,7 +208,8 @@ def testRbf(k1=1.3):
         kernelEval = kernelTrans(sVs,datMat[i,:],('rbf', k1))
         predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b
         if sign(predict)!=sign(labelArr[i]): errorCount += 1    
-    print "the test error rate is: %f" % (float(errorCount)/m)    
+    print "the test error rate is: %f" % (float(errorCount)/m)  
+    return alphas[svInd], b  
     
 def img2vector(filename):
     returnVect = zeros((1,1024))
