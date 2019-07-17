@@ -8,3 +8,10 @@ def divide_on_feature(X, feature_i, threshold):
     idx1 = X[:, feature_i] <= threshold
     idx2 = X[:, feature_i] > threshold
     return X[idx1], X[idx2]
+
+
+def calc_variance(y):
+    """Variance computed.
+    :y: list or np.narray
+    """
+    return y.var()

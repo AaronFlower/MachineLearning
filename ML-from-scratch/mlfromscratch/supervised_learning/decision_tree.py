@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# references: https://github.com/eriklindernoren/ML-From-Scratch
+"""
+Code Reference: https://github.com/eriklindernoren/ML-From-Scratch
+树的实现并不要求传入的样本集 X, y 是 np.narray 的类型，所以在编码计算时使用很多
+np 的方法，如: np.shape(), np.expand_dims(), 包括在计算 var, mean 时，这样实现
+起来很不方便，如是不能向量化操作的话，性能也会变的很差。所在自己实现中，保证操
+作的类型是 np.narray 类型很重要。
+
+- [ ] Only support np.narray
+
+"""
 
 import numpy as np
 
@@ -56,14 +65,14 @@ class DecisionTree(object):
             loss function is used for Gradient Boosting models for calculate
             impurity.
     '''
-    def __init__(self, min_samples_split = 2, min_impurity = 1e-7,
-                 max_depth = float('inf'), loss = None):
+    def __init__(self, min_samples_split=2, min_impurity=1e-7,
+                 max_depth=float('inf'), loss=None):
         self.root = None
         self.min_samples_split = min_samples_split
         self.min_impurity = min_impurity
         self.max_depth = max_depth
-        self._impurity_calc = None
-        self._leaf_value_calc = None
+        self._impurity_calc = None      # 划分准则
+        self._leaf_value_calc = None    # 叶子生成准则
         # If y is one-hot encoded (multi-dim) or not(one-dim)
         self.one_dim = None
         # If Gradient Boost
@@ -71,11 +80,11 @@ class DecisionTree(object):
 
     def fit(self, X, y, loss=None):
         """ Build decision tree  """
-        self.one_dim = len(np.shape(y)) == 1 # as y may not is np.narray
+        self.one_dim = len(np.shape(y)) == 1    # as y may not is np.narray
         self.root = self._build_tree(X, y)
         self.loss = None
 
-    def _build_tree(self, X, y, cur_depth):
+    def _build_tree(self, X, y, cur_depth=0):
         """Recursive method which builds out the decision tree and
         splits X and  respective y on the feature of X which (based on
         impurity) best separates the data
@@ -86,10 +95,10 @@ class DecisionTree(object):
 
         # Check if expansion of is needed
         if len(np.shape(y)) == 1:
-            y = np.expand_dims(y, axis = 1)
+            y = np.expand_dims(y, axis=1)
 
         # Add y as last column of X
-        Xy = np.concatenate((X, y), axis = 1)
+        Xy = np.concatenate((X, y), axis=1)
 
         n_samples, n_features = np.shape(X)
 
@@ -97,7 +106,7 @@ class DecisionTree(object):
             # Calculate the impurity for each feature
             for feature_i in range(n_features):
                 # All values of feature_i
-                feature_values = np.expand_dims(X[:, feature_i], axis = 1)
+                feature_values = np.expand_dims(X[:, feature_i], axis=1)
                 unique_values = np.unique(feature_values)
 
                 # Iterate through all unique values of feature column i and
@@ -106,7 +115,7 @@ class DecisionTree(object):
                     Xy1, Xy2 = divide_on_feature(Xy, feature_i, threshold)
 
                     if len(Xy1) > 0 and len(Xy2) > 0:
-                        y1 = Xy1[:, -1:] # The difference between Xy1[:, -1]
+                        y1 = Xy1[:, -1:]  # The difference between Xy1[:, -1]
                         y2 = Xy2[:, -1:]
 
                         # Calcualte impurity
@@ -121,7 +130,7 @@ class DecisionTree(object):
                                 "feature_i": feature_i,
                                 "threshold": threshold
                             }
-                            best_tests = {
+                            best_sets = {
                                 "leftX": Xy1[:, :n_features],
                                 "lefty": Xy1[:, n_features:],
                                 "rightX": Xy2[:, :n_features],
@@ -133,10 +142,10 @@ class DecisionTree(object):
                                            best_sets["lefty"], cur_depth + 1)
             false_branch = self._build_tree(best_sets["rightX"],
                                             best_sets["righty"], cur_depth + 1)
-            return DecisionNode(feature_i = best_criteria['feature_i'],
-                                threshold = best_criteria['threshold'],
-                                true_branch =  true_branch,
-                                false_branch = false_branch)
+            return DecisionNode(feature_i=best_criteria['feature_i'],
+                                threshold=best_criteria['threshold'],
+                                true_branch=true_branch,
+                                false_branch=false_branch)
 
         # We're at leaf => determine value
         leaf_value = self._leaf_value_calc(y)
@@ -165,36 +174,44 @@ class DecisionTree(object):
         y_pred = [self.predict_value(sample) for sample in X]
         return y_pred
 
+    def print_tree(self, tree=None, indent=" "):
+        """
+        Recursively print the decision tree
+        """
+        if tree is None:
+            tree = self.root
+
+        if tree.value is not None:
+            print("{0:.3f}".format(tree.value))
+        else:
+            print("{0}:{1:.2f}".format(tree.feature_i, tree.threshold))
+            print("%sT->" % (indent), end="")
+            self.print_tree(tree.true_branch, indent + indent)
+            print("%sF->" % (indent), end="")
+            self.print_tree(tree.false_branch, indent + indent)
+
+
 class RegressionTree(DecisionTree):
 
     """RegressionTree for Gradient Boosting"""
 
-    def __init__(self):
-        DecisionTree.__init__(self)
+    def __init__(self, max_depth):
+        DecisionTree.__init__(self, max_depth = max_depth)
 
     def _calc_variance_reduction(self, y, y1, y2):
-        var_total = calc_variance(y)
-        var_1 = calc_variance(y1)
-        var_2 = calc_variance(y2)
+        y_var = y.var()
+        y1_var = y1.var()
+        y2_var = y2.var()
+
         frac_1 = len(y1) / len(y)
         frac_2 = len(y2) / len(y)
 
-        # calc the variance reduction
-        var_reduction = var_total - (frac_1 * var_1 + frac_2 * var_2)
-        return sum(var_reduction)
+        return y_var - (frac_1 * y1_var + frac_2 * y2_var)
 
     def _mean_of_y(self, y):
-        value = np.mean(y, axis = 0)
-        return value if len(value)> 1 else value[0]
+        return y.mean()
 
     def fit(self, X, y):
-        """TODO: Docstring for fit.
-
-        :X: TODO
-        :y: TODO
-        :returns: TODO
-
-        """
         self._impurity_calc = self._calc_variance_reduction
         self._leaf_value_calc = self._mean_of_y
         super(RegressionTree, self).fit(X, y)
