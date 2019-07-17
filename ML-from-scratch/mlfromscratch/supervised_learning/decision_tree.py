@@ -164,7 +164,7 @@ class DecisionTree(object):
 
         feature_value = x[tree.feature_i]
         branch = tree.false_branch
-        if feature_value >= tree.threshold:
+        if feature_value <= tree.threshold:
             branch = tree.true_branch
 
         return self.predict_value(x, branch)
@@ -185,9 +185,9 @@ class DecisionTree(object):
             print("{0:.3f}".format(tree.value))
         else:
             print("{0}:{1:.2f}".format(tree.feature_i, tree.threshold))
-            print("%sT->" % (indent), end="")
+            print(indent + "T->", end="")
             self.print_tree(tree.true_branch, indent + indent)
-            print("%sF->" % (indent), end="")
+            print(indent + "F->", end="")
             self.print_tree(tree.false_branch, indent + indent)
 
 

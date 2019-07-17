@@ -33,7 +33,7 @@ def main():
 
     X_train, y_train, X_test, y_test = train_test_split(X, y, test_size = 0.3)
 
-    model = RegressionTree(3)
+    model = RegressionTree(4)
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
