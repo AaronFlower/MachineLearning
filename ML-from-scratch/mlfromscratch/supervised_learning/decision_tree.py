@@ -12,6 +12,23 @@ np 的方法，如: np.shape(), np.expand_dims(), 包括在计算 var, mean 时�
 """
 
 import numpy as np
+import math
+
+
+def log2(x):
+    return math.log(x) / math.log(2)
+
+
+def calc_entropy(y):
+    """ Calculate the entropy of y """
+    values = np.unique(y)
+    n = len(y)
+    entropy = 0
+    for v in values:
+        count = len(y[y == v])
+        p = count / n
+        entropy -= p * log2(p)
+    return entropy
 
 
 def divide_on_feature(X, feature_i, threshold):
@@ -184,19 +201,18 @@ class DecisionTree(object):
         if tree.value is not None:
             print("{0:.3f}".format(tree.value))
         else:
-            print("{0}:{1:.2f}".format(tree.feature_i, tree.threshold))
+            print("{0}:{1:.1f}".format(tree.feature_i, tree.threshold))
             print(indent + "T->", end="")
             self.print_tree(tree.true_branch, indent + indent)
             print(indent + "F->", end="")
             self.print_tree(tree.false_branch, indent + indent)
 
-
 class RegressionTree(DecisionTree):
 
     """RegressionTree for Gradient Boosting"""
 
-    def __init__(self, max_depth):
-        DecisionTree.__init__(self, max_depth = max_depth)
+    def __init__(self, max_depth=float('inf')):
+        DecisionTree.__init__(self, max_depth=max_depth)
 
     def _calc_variance_reduction(self, y, y1, y2):
         y_var = y.var()
@@ -215,3 +231,38 @@ class RegressionTree(DecisionTree):
         self._impurity_calc = self._calc_variance_reduction
         self._leaf_value_calc = self._mean_of_y
         super(RegressionTree, self).fit(X, y)
+
+
+class ClassificationTree(DecisionTree):
+
+    """Classification Tree"""
+
+    def __init__(self, max_depth=float('inf')):
+        """ """
+        DecisionTree.__init__(self, max_depth=max_depth)
+
+    def _calc_info_gain(self, y, y1, y2):
+        ent_y = calc_entropy(y)
+        ent_y1 = calc_entropy(y1)
+        ent_y2 = calc_entropy(y2)
+
+        frac_1 = len(y1)/len(y2)
+        frac_2 = 1 - frac_1
+        info_gain = ent_y - (frac_1 * ent_y1 + frac_2 * ent_y2)
+        return info_gain
+
+    def _majority_vote(self, y):
+        label = None
+        max_count = 0
+        values = np.unique(y)
+        for v in values:
+            count = len(y[y == v])
+            if count >= max_count:
+                count = max_count
+                label = v
+        return label
+
+    def fit(self, X, y):
+        self._impurity_calc = self._calc_info_gain
+        self._leaf_value_calc = self._majority_vote
+        DecisionTree.fit(self, X, y)
