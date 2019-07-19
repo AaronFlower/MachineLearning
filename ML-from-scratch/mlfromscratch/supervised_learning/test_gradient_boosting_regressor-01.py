@@ -14,7 +14,7 @@ def main():
 
     train_X, train_y, test_X, test_y = train_test_split(X, y)
 
-    model = GBReg(n_estimators=3, learning_rate=0.5)
+    model = GBReg(n_estimators=200, learning_rate=0.5)
     model.fit(train_X, train_y)
     y_pred = model.predict(test_X)
 

@@ -67,8 +67,9 @@ class GradientBoosting(object):
         y_pred = np.full(y.shape, y.mean())
 
         for i in tqdm(range(self.n_estimators)):
-            gradient = - self.loss.gradient(y, y_pred)
-            self.trees[i].fit(X, gradient)
+            residuals = y - y_pred
+            gradient = np.sign(residuals)
+            self.trees[i].fit(X, gradient, residuals=residuals)
             y_pred_i = np.array(self.trees[i].predict(X)).reshape(-1, 1)
             y_pred = y_pred + self.learning_rate * y_pred_i
 

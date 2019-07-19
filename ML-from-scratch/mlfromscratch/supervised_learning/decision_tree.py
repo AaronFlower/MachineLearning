@@ -95,13 +95,13 @@ class DecisionTree(object):
         # If Gradient Boost
         self.loss = loss
 
-    def fit(self, X, y, loss=None):
+    def fit(self, X, y, loss=None, redisuals=None):
         """ Build decision tree  """
         self.one_dim = len(np.shape(y)) == 1    # as y may not is np.narray
-        self.root = self._build_tree(X, y)
+        self.root = self._build_tree(X, y, redisuals=redisuals)
         self.loss = None
 
-    def _build_tree(self, X, y, cur_depth=0):
+    def _build_tree(self, X, y, cur_depth=0, redisuals=None):
         """Recursive method which builds out the decision tree and
         splits X and  respective y on the feature of X which (based on
         impurity) best separates the data
@@ -166,6 +166,8 @@ class DecisionTree(object):
 
         # We're at leaf => determine value
         leaf_value = self._leaf_value_calc(y)
+        if redisuals is not None:
+            leaf_value = np.median(y)
 
         return DecisionNode(value=leaf_value)
 
@@ -224,15 +226,10 @@ class RegressionTree(DecisionTree):
     def _mean_of_y(self, y):
         return y.mean()
 
-    def _median_of_y(self, y):
-        print(y)
-        print('medain of y', np.median(y))
-        return np.median(y)
-
-    def fit(self, X, y):
+    def fit(self, X, y, residuals=None):
         self._impurity_calc = self._calc_variance_reduction
-        self._leaf_value_calc = self._median_of_y
-        super(RegressionTree, self).fit(X, y)
+        self._leaf_value_calc = self._mean_of_y
+        super(RegressionTree, self).fit(X, y, residuals)
 
 
 class ClassificationTree(DecisionTree):
