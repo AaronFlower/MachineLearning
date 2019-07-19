@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def divide_on_feature(X, feature_i, threshold):
     """Split data on feature i by threshold
     :X: Dataset
@@ -15,3 +18,18 @@ def calc_variance(y):
     :y: list or np.narray
     """
     return y.var()
+
+def train_test_split(X, y, test_size=0.2):
+    m, _ = X.shape
+    idx = np.random.permutation(m)
+    split_value = int(m * (1 - test_size))
+    train_idx = idx[0:split_value]
+    test_idx = idx[split_value:-1]
+
+    train_X, train_y = X[train_idx], y[train_idx]
+    test_X, test_y = X[test_idx], y[test_idx]
+    return train_X, train_y, test_X, test_y
+
+def mean_squared_error(y, y_hat):
+    diff = (y - y_hat) ** 2
+    return diff.mean()

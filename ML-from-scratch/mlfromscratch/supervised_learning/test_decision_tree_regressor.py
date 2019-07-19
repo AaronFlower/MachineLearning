@@ -1,24 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from decision_tree import RegressionTree
-
-
-def train_test_split(X, y, test_size=0.2):
-    m, _ = X.shape
-    idx = np.random.permutation(m)
-    split_value = int(m * (1 - test_size))
-    train_idx = idx[0:split_value]
-    test_idx = idx[split_value:-1]
-
-    train_X, train_y = X[train_idx], y[train_idx]
-    test_X, test_y = X[test_idx], y[test_idx]
-    return train_X, train_y, test_X, test_y
-
-
-def mean_squared_error(y, y_hat):
-    diff = (y - y_hat) ** 2
-    return diff.mean()
+from utils import train_test_split, mean_squared_error
 
 
 def main():
@@ -42,7 +27,7 @@ def main():
     mse = mean_squared_error(y_test, y_pred)
     print("Mean Squared Error:", mse)
 
-    model.print_tree()
+    # model.print_tree()
 
     # Color map
     cmap = plt.get_cmap('viridis')

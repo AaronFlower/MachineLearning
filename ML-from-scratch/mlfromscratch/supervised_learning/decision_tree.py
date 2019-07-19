@@ -211,9 +211,6 @@ class RegressionTree(DecisionTree):
 
     """RegressionTree for Gradient Boosting"""
 
-    def __init__(self, max_depth=float('inf')):
-        DecisionTree.__init__(self, max_depth=max_depth)
-
     def _calc_variance_reduction(self, y, y1, y2):
         y_var = y.var()
         y1_var = y1.var()
@@ -227,9 +224,14 @@ class RegressionTree(DecisionTree):
     def _mean_of_y(self, y):
         return y.mean()
 
+    def _median_of_y(self, y):
+        print(y)
+        print('medain of y', np.median(y))
+        return np.median(y)
+
     def fit(self, X, y):
         self._impurity_calc = self._calc_variance_reduction
-        self._leaf_value_calc = self._mean_of_y
+        self._leaf_value_calc = self._median_of_y
         super(RegressionTree, self).fit(X, y)
 
 
@@ -237,9 +239,10 @@ class ClassificationTree(DecisionTree):
 
     """Classification Tree"""
 
-    def __init__(self, max_depth=float('inf')):
-        """ """
-        DecisionTree.__init__(self, max_depth=max_depth)
+    # 不写构造函数，就会默认调用父类构造函数。
+    # def __init__(self, max_depth=float('inf')):
+    #     """ """
+    #     DecisionTree.__init__(self, max_depth=max_depth)
 
     def _calc_info_gain(self, y, y1, y2):
         ent_y = calc_entropy(y)
