@@ -33,3 +33,6 @@ def train_test_split(X, y, test_size=0.2):
 def mean_squared_error(y, y_hat):
     diff = (y - y_hat) ** 2
     return diff.mean()
+
+def accuracy_score(y, y_hat):
+    return np.sum(y == y_hat, axis=0) / len(y)

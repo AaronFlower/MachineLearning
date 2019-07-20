@@ -63,14 +63,15 @@ class GradientBoosting(object):
             self.trees.append(tree)
 
     def fit(self, X, y):
-        self.f0 = y.mean()
-        y_pred = np.full(y.shape, y.mean())
+        self.f0 = y.mean(axis=0)
+        y_pred = np.full(y.shape, y.mean(axis=0))
+        print('y_pred', y_pred.shape)
 
         for i in tqdm(range(self.n_estimators)):
             residuals = y - y_pred
             gradient = np.sign(residuals)
             self.trees[i].fit(X, gradient, residuals=residuals)
-            y_pred_i = np.array(self.trees[i].predict(X)).reshape(-1, 1)
+            y_pred_i = np.array(self.trees[i].predict(X))
             y_pred = y_pred + self.learning_rate * y_pred_i
 
     def predict(self, X):
@@ -79,7 +80,7 @@ class GradientBoosting(object):
 
         # Make predictions
         for tree in self.trees:
-            y_pred_i = np.array(tree.predict(X)).reshape(m, 1)
+            y_pred_i = np.array(tree.predict(X))
             y_pred += self.learning_rate * y_pred_i
 
         if not self.regression:
@@ -114,7 +115,7 @@ class GradientBoostingClassifier(GradientBoosting):
                                   min_samples_split=min_samples_split,
                                   min_impurity=min_info_gain,
                                   max_depth=max_depth,
-                                  regression=True)
+                                  regression=False)
 
     def fit(self, X, y):
         y = to_categorical(y)

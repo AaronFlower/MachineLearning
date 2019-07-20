@@ -111,7 +111,7 @@ class DecisionTree(object):
         best_sets = None
 
         # Check if expansion of is needed
-        if len(np.shape(y)) == 1:
+        if len(y.shape) == 1:
             y = np.expand_dims(y, axis=1)
 
         # Add y as last column of X
@@ -132,8 +132,11 @@ class DecisionTree(object):
                     Xy1, Xy2 = divide_on_feature(Xy, feature_i, threshold)
 
                     if len(Xy1) > 0 and len(Xy2) > 0:
-                        y1 = Xy1[:, -1:]  # The difference between Xy1[:, -1]
-                        y2 = Xy2[:, -1:]
+                        # y1 = Xy1[:, -1:]  # The difference between Xy1[:, -1]
+                        # y2 = Xy2[:, -1:]
+                        # you cant use y1 = Xy1[:, -1:] because the y is multi
+                        y1 = Xy1[:, n_features:]
+                        y2 = Xy2[:, n_features:]
 
                         # Calcualte impurity
                         impurity = self._impurity_calc(y, y1, y2)
@@ -149,9 +152,9 @@ class DecisionTree(object):
                             }
                             best_sets = {
                                 "leftX": Xy1[:, :n_features],
-                                "lefty": Xy1[:, n_features:],
+                                "lefty": y1,
                                 "rightX": Xy2[:, :n_features],
-                                "righty": Xy2[:, n_features:]
+                                "righty": y2
                             }
 
         if largest_impurity > self.min_impurity:
@@ -209,22 +212,38 @@ class DecisionTree(object):
             print(indent + "F->", end="")
             self.print_tree(tree.false_branch, indent + indent)
 
+
 class RegressionTree(DecisionTree):
 
     """RegressionTree for Gradient Boosting"""
 
+    def _calc_variance(self, y):
+        '''
+        https://stattrek.com/matrix-algebra/covariance-matrix.aspx#Problem1
+        一维向量可以很容易计算相应的方差，对于多维向量。计算时应使用矩阵的
+        variance-covariance 来计算，最后对对角线上的元素求和即可。
+        '''
+        deviation = y - y.mean(axis=0)
+        covariance = deviation.T.dot(deviation) / len(y)
+        return np.diag(covariance)
+
     def _calc_variance_reduction(self, y, y1, y2):
-        y_var = y.var()
-        y1_var = y1.var()
-        y2_var = y2.var()
+        # https://stattrek.com/matrix-algebra/covariance-matrix.aspx#Problem1
+        # 一维向量可以很容易计算相应的方差，对于多维向量。计算时应使用矩阵的
+        # variance-covariance 来计算，最后对对角线上的元素求和即可。
+        y_var = self._calc_variance(y)
+        y1_var = self._calc_variance(y1)
+        y2_var = self._calc_variance(y2)
 
         frac_1 = len(y1) / len(y)
         frac_2 = len(y2) / len(y)
 
-        return y_var - (frac_1 * y1_var + frac_2 * y2_var)
+        return sum(y_var - (frac_1 * y1_var + frac_2 * y2_var))
 
     def _mean_of_y(self, y):
-        return y.mean()
+        # 应该注意目标可能是 one-hot 的
+        value = y.mean(axis=0)
+        return value[0] if self.one_dim else value
 
     def fit(self, X, y, residuals=None):
         self._impurity_calc = self._calc_variance_reduction
