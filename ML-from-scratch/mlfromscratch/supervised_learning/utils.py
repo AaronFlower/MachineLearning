@@ -19,6 +19,7 @@ def calc_variance(y):
     """
     return y.var()
 
+
 def train_test_split(X, y, test_size=0.2):
     m, _ = X.shape
     idx = np.random.permutation(m)
@@ -30,9 +31,19 @@ def train_test_split(X, y, test_size=0.2):
     test_X, test_y = X[test_idx], y[test_idx]
     return train_X, train_y, test_X, test_y
 
+
 def mean_squared_error(y, y_hat):
     diff = (y - y_hat) ** 2
     return diff.mean()
 
+
 def accuracy_score(y, y_hat):
     return np.sum(y == y_hat, axis=0) / len(y)
+
+
+def to_categorical(y):
+    m = np.shape(y)[0]
+    col = np.max(y) + 1
+    one_hot = np.zeros((m, col))
+    one_hot[np.arange(m), y] = 1
+    return one_hot

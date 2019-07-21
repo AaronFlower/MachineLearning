@@ -285,3 +285,53 @@ class ClassificationTree(DecisionTree):
         self._impurity_calc = self._calc_info_gain
         self._leaf_value_calc = self._majority_vote
         DecisionTree.fit(self, X, y)
+
+
+class XGBoostRegressionTree(DecisionTree):
+
+    """XGBoostRegressionTree"""
+
+    def _split(self, y):
+        """
+        y contains y_true in left half of the middle column and
+        y_pred in the right half.
+        Split and return the two matrices
+        """
+        col = int(np.shape(y)[1]/2)
+        y, y_pred = y[:, :col], y[:, col:]
+        return y, y_pred
+
+    def _gain(self, y, y_pred):
+        gi = self.loss.gradient(y, y_pred)
+        hi = self.loss.hess(y, y_pred)
+        print(gi)
+        print(hi)
+        nominator = np.power((y * gi).sum(), 2)
+        denominator = hi.sum()
+        return 0.5 * (nominator / denominator)
+
+    def _gain_by_taylor(self, y, y1, y2):
+        # Split to compute impurity
+        y, y_pred = self._split(y)
+        y1, y1_pred = self._split(y1)
+        y2, y2_pred = self._split(y2)
+
+        true_gain = self._gain(y1, y1_pred)
+        false_gain = self._gain(y2, y2_pred)
+        gain = self._gain(y, y_pred)
+        return true_gain + false_gain - gain
+
+    def _approximate_update(self, y):
+        # to evaluate the leaf
+        # y split into y, y_pred
+        y, y_pred = self._split(y)
+        # Newton's Method
+        gi = np.sum(y * self.loss.gradient(y, y_pred), axis=0)
+        hi = np.sum(self.loss.hess(y, y_pred), axis=0)
+        update_approximation = hi / gi
+        return update_approximation
+
+    def fit(self, X, y):
+        self._impurity_calc = self._gain_by_taylor
+        self._leaf_value_calc = self._approximate_update
+        DecisionTree.fit(self, X, y)
