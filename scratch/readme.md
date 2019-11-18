@@ -15,6 +15,15 @@
 - [ ] DeepFM
 
 
+### Optimizer
+
+- [ ] SGD
+- [ ] AdaGrad
+- [ ] Adam
+- [ ] RMSProp
+- [ ] Ftrl
+
+
 ### About sklearn
 
 sklearn Provides a dataset tool to generate datasets for both classification and regression.

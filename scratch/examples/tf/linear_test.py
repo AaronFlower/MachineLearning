@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from mlearn import linear
+from mlearn.tf import linear
 import matplotlib.pyplot as plt
 
 from sklearn import datasets
@@ -22,7 +22,7 @@ print(train_X.shape, train_y.shape)
 print(val_X.shape, val_y.shape)
 print(test_X.shape, test_y.shape)
 
-epochs = 2000
+epochs = 10
 
 models = {
     # "LinearNaive": {
@@ -31,7 +31,7 @@ models = {
     #     "val": None,
     # },
     "Linear-L2": {
-        "model": linear.Linear(train_dataset, val=val, epochs=epochs, learning_rate=1, reg="L2"),
+        "model": linear.Linear(train_dataset, val=val, epochs=epochs, learning_rate=0.01, reg="L2"),
         "loss": None,
         "val": None,
     }

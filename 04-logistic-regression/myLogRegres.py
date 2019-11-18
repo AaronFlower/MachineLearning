@@ -7,7 +7,7 @@ import numpy as np
 # 加载数据，取出训练集中的， X, Y。 对于 X 假设特征 x0 = 1.0
 def loadData():
 	dataMat = []; labelMat = []
-	fr = open('./Ch05/testSet.txt')
+	fr = open('./Ch05/testSet01.txt')
 	for line in fr.readlines():
 		lineStr = line.strip()
 		lineList = lineStr.split()

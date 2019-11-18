@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from mlearn.lr import LRModel
+from mlearn.tf.lr import LRModel
 
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
