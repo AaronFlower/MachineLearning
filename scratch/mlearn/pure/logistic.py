@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import roc_auc_score
 
 
 def cross_entropy(y_hat, y):
@@ -38,11 +39,14 @@ class Base(object):
         assert y_train.shape == (m, 1)
         losses = []
         val_losses = []
+        aucs = []
         for i in range(self.epochs):
             y_hat = self.sigmoid(X_train)
+            auc = roc_auc_score(y_train.reshape(-1), y_hat.reshape(-1))
             loss = cross_entropy(y_hat, y_train)
             diff = y_hat - y_train
             losses.append(loss)
+            aucs.append(auc)
             self.bias = self.bias - self.learning_rate * np.mean(diff)
             self.weights = self.weights - self.learning_rate * X_train.T.dot(diff)
 
@@ -51,4 +55,4 @@ class Base(object):
                 val_loss = cross_entropy(val_hat, y_val)
                 val_losses.append(val_loss)
 
-        return losses, val_losses
+        return losses, val_losses, aucs

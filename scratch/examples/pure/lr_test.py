@@ -15,13 +15,14 @@ X = (X - X_min) / (X_max - X_min)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
-epochs = 1000
+epochs = 100
 models = [
     {
         "name": "Alpha=0.03",
         "model": LogisticRegression(verbosity=0, epochs=epochs, learning_rate=0.03),
         "loss": None,
         "val": None,
+        "auc": None,
         "acc": None,
     },
 
@@ -30,6 +31,7 @@ models = [
         "model": LogisticRegression(verbosity=0, epochs=epochs, learning_rate=0.1),
         "loss": None,
         "val": None,
+        "auc": None,
         "acc": None,
     },
 
@@ -38,13 +40,14 @@ models = [
         "model": LogisticRegression(verbosity=0, epochs=epochs, learning_rate=0.5),
         "loss": None,
         "val": None,
+        "auc": None,
         "acc": None,
     }
 ]
 
 
 for m in models:
-    m["loss"], m["val"] = m["model"].train(X_train, y_train, X_val, y_val)
+    m["loss"], m["val"], m["auc"] = m["model"].train(X_train, y_train, X_val, y_val)
     y_pred = m["model"].predict(X_test)
 
     count = 0
@@ -55,10 +58,13 @@ for m in models:
 
 x_epochs = np.arange(1, epochs + 1)
 
+fig, axes = plt.subplots(2, 1)
+
 color_map = plt.get_cmap("tab10")
 for i, m in enumerate(models):
-    plt.plot(x_epochs, m['loss'], label=m["name"] + " Loss, " + m["acc"], color=color_map(i), linestyle="-")
-    plt.plot(x_epochs, m['val'], label=m["name"] + " Val", color=color_map(i), linestyle="dotted")
+    axes[0].plot(x_epochs, m['loss'], label=m["name"] + " Loss, " + m["acc"], color=color_map(i), linestyle="-")
+    axes[0].plot(x_epochs, m['val'], label=m["name"] + " Val", color=color_map(i), linestyle="dotted")
+    axes[1].plot(x_epochs, m['auc'], label=m['name'] + ' AUC', color=color_map(i))
 
 plt.legend()
 plt.show()
