@@ -74,6 +74,18 @@ d(UK, USA) = d(UK, French) = sqrt(2)
 
 1. [Why does one hot encoding improve machine learning performance?](https://stackoverflow.com/questions/17469835/why-does-one-hot-encoding-improve-machine-learning-performance)
 
+#### 2. 为什么需要进行 One-hot? 又什么进行 Embedding?
+
+TL;DR; 
+- 进行 One-hot 是为了避免欠拟合 (Underfitting); 
+- 进行 Embedding 是为避免过拟合 (Overfitting)
+
+如是一个类别特征不进行 One-hot，那么这个特征就学习到一个参数（在 LR 模型中），那么最终模型就会表现为欠拟合。
+
+当我们对特征进行了 One-hot 之后，就可以解决欠拟合的问题了。但是如果为特征的每一个值都学习到一个参数（如决策树中每一个值一个分支），
+那么模型就会表现为过拟合。所以我们可以用 Embedding 来解决 One-hot 后的过拟合问题。
+
+训练好的 Embedding 层，我们需要保存下来。
 
 
 
