@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import roc_auc_score
 
 
 def cross_entropy(y_score, y):
@@ -50,6 +51,7 @@ class BaseLR(object):
 
         losses = []
         val_losses = []
+        aucs = []
 
         for i in range(self.epochs):
             y_score = self.sigmoid(X_train)
@@ -66,14 +68,19 @@ class BaseLR(object):
                 y_score = self.sigmoid(X_val)
                 loss = cross_entropy(y_score, y_val)
                 val_losses.append(loss)
+                auc = roc_auc_score(y_val, y_score)
+                aucs.append(auc)
 
-        return losses, val_losses
+        return losses, val_losses, aucs
 
 
 class PolyLR(BaseLR):
-    def __init__(self, epochs=1000, learning_rate=0.001, verbosity=1):
+    def __init__(self, epochs=1000, learning_rate=0.001, verbosity=1, degree=2, interaction_only=True):
         super(PolyLR, self).__init__(epochs=epochs, learning_rate=learning_rate, verbosity=verbosity)
-        self.transformX = PolynomialFeatures(degree=2, include_bias=False, interaction_only=True).fit_transform
+        poly = PolynomialFeatures(degree=degree,
+                                  include_bias=False,
+                                  interaction_only=interaction_only)
+        self.transformX = poly.fit_transform
 
 
 

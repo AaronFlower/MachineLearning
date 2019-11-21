@@ -37,7 +37,7 @@ train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2)
 train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.2)
 
 for m in models:
-    m["loss"], m["val"] = m["model"].train(train_X, train_y, val_X, val_y)
+    m["loss"], m["val"], m['aucs'] = m["model"].train(train_X, train_y, val_X, val_y)
 
 
 x_epochs = np.arange(1, epochs + 1)
@@ -46,6 +46,7 @@ color_map = plt.get_cmap("tab10")
 for i, m in enumerate(models):
     plt.plot(x_epochs, m['loss'], label=m["name"] + " Loss", color=color_map(i), linestyle="-")
     plt.plot(x_epochs, m['val'], label=m["name"] + " Val", color=color_map(i), linestyle=":")
+
 
 plt.legend()
 plt.show()
